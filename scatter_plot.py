@@ -90,33 +90,36 @@ df_2 = df_1.groupby(['Period','constructor', 'circuit', 'Grand Prix'], as_index=
 df_2.rename(columns={'win':'win_period'}, inplace=True)
 
 
-
+lap_times_2 = lap_times.merge(df_1[['raceId', 'circuitId', 'circuit', 'year']], on='raceId')
 ##### OPTIONS #################################################################################################
 years = list(set(np.array(races['year'])))
 circuits = list(set(np.array(df_2['circuit'])))
 
-options_year = [{'label':i, 'value':i} for i in years]
-options_year = sorted(options_year, key=lambda x: x["label"])
+years_circuits = list(set(np.array(lap_times_2['year'])))
 
-# options for the first bar race chart
-options_circuit = [{'label':i, 'value':i} for i in circuits]
-options_circuit = sorted(options_circuit, key=lambda x: x["label"])
+
+# options_year = [{'label':i, 'value':i} for i in years]
+# options_year = sorted(options_year, key=lambda x: x["label"])
+
+# # options for the first bar race chart
+# options_circuit = [{'label':i, 'value':i} for i in circuits]
+# options_circuit = sorted(options_circuit, key=lambda x: x["label"])
 
 
 ##### DROPDOWN/SLIDERS/ETC ####################################################################################
 
-dropdown_year = dcc.Dropdown(
-                            id='drop_year',
-                            options=options_year#,
-                            #value=2021
-                            )
+# dropdown_year = dcc.Dropdown(
+#                             id='drop_year',
+#                             options=options_year#,
+#                             #value=2021
+#                             )
 
-# dropdown for the first bar race chart
-dropdown_circuit = dcc.Dropdown(
-                            id='drop_circuit',
-                            options=options_circuit#,
-                            #value='A1-Ring'
-                            )
+# # dropdown for the first bar race chart
+# dropdown_circuit = dcc.Dropdown(
+#                             id='drop_circuit',
+#                             options=options_circuit#,
+#                             #value='A1-Ring'
+#                             )
 
 
 ##### APP #####################################################################################################
@@ -125,43 +128,77 @@ server = app.server
 
 
 app.layout = html.Div([
-    html.H1('Position of a driver in each lap'),
+    html.H1('Position of the drivers in each lap '),
 
     html.Br(),
 
-    html.Label('Choose a year:'),
-    dropdown_year,
-    
-    html.Br(),
+    html.Div([
+        html.Div([
+            html.P('Select Year:', className = 'fix_label', style = {'color': 'black'}),
+            dcc.Dropdown(id = 'w_years',
+                         multi = False,
+                         clearable = True,
+                         disabled = False,
+                         style = {'display': True},
+                         value = 1996,
+                         placeholder = 'Select Year',
+                         options = [{'label': c, 'value': c}
+                                    for c in years_circuits], className = 'dcc_compon'),
 
-    html.Label('Choose a circuit:'),
-    dropdown_circuit,
+            html.P('Select Circuit:', className = 'fix_label', style = {'color': 'black'}),
+            dcc.Dropdown(id = 'w_circuits1',
+                         multi = False,
+                         clearable = True,
+                         disabled = False,
+                         style = {'display': True},
+                         placeholder = 'Select Circuit',
+                         options = [], className = 'dcc_compon'),
 
-    dcc.Graph(
-        id='position_lap'
-    )
 
-])
+        ], className = "create_container three columns"),
+
+        html.Div([
+            dcc.Graph(id = 'scatter_plot',
+                      config = {'displayModeBar': 'hover'}),
+
+        ], className = "create_container six columns"),
+
+    ], className = "row flex-display"),
+
+], id = "mainContainer", style = {"display": "flex", "flex-direction": "column"})
+
 
 
 ##### CALLBACKS ###############################################################################################
 
 @app.callback(
-    Output(component_id='position_lap', component_property='figure'),
-    
-    [Input(component_id='drop_year', component_property='value'),
-    Input(component_id='drop_circuit', component_property='value')
-    ]
-)
+    Output('w_circuits1', 'options'),
+    Input('w_years', 'value'))
+def get_circuit_options(w_years):
+    df_3 = df_1[df_1['year'] == w_years]
+    return [{'label': i, 'value': i} for i in sorted(list(set(df_3['circuit'])))]
+
+
+@app.callback(
+    Output('w_circuits1', 'value'),
+    Input('w_circuits1', 'options'))
+def get_circuit_value(w_circuits1):
+    return [k['value'] for k in w_circuits1][0]
+
+
+
+@app.callback(Output('scatter_plot', 'figure'),
+              [Input('w_years', 'value')],
+              [Input('w_circuits1', 'value')])
 
 
 
 ##### Visualizations ##########################################################################################
 
-def callback_1(year, circuit):#input_value):
+def callback_1(w_years, w_circuits1):
     ############# Scatter (line) plot #########################################################################
     race = races.copy()
-    race =  df_1.loc[(df_1['year']==year) & (df_1['circuit']==circuit)]['raceId'].values[0]
+    race =  df_1.loc[(df_1['year']==w_years) & (df_1['circuit']==w_circuits1)]['raceId'].values[0]
     
     #dataframe of lap_times for that race
     pos_per_lap = lap_times[lap_times['raceId']==race]  
@@ -177,12 +214,16 @@ def callback_1(year, circuit):#input_value):
                  name=name)#, line=dict(color= palette.pop(0)))
                                 for driver, name in driver_dict.items()]
    
-    layout_ppl = dict(title=dict(text=f'Position of the drivers in each lap in the circuit {circuit}'),
+    layout_ppl = dict(title=dict(text='Position of the drivers in each lap of this race'),
                       xaxis=dict(title='Lap'),
                       yaxis=dict(title='Position'))
 
+    fig_ppl = go.Figure(data=data_ppl, layout=layout_ppl)
+    
+    x_max = pos_per_lap['lap'].max()
+    fig_ppl.update_xaxes(range=(1,x_max))
 
-    return go.Figure(data=data_ppl, layout=layout_ppl)
+    return fig_ppl
 
 if __name__ == '__main__':
     app.run_server(debug=True) 
