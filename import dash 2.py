@@ -285,52 +285,52 @@ def display_sankey(year,drivID,pstn):
 
     results_year_pstn = results_year[results_year['grid']==pstn]
 
-    results_year_pstn_driver = \
-    results_year_pstn[results_year_pstn['driverId']==drivID]
+    # results_year_pstn_driver = \
+    # results_year_pstn[results_year_pstn['driverId']==drivID]
 
-    results_y = results_year[['driverId',\
-    'driverName','raceId','grid','position','code','dob','nationality']]
+    # results_y = results_year[['driverId',\
+    # 'driverName','raceId','grid','position','code','dob','nationality']]
 
-    results_y_abr = results_y[['position','grid','driverName']].sort_values(['position','grid','driverName'])
-    results_y_abr['driverGrid'] = \
-    results_y_abr['driverName'] + ' - ' + results_y_abr['grid'].astype(str)
+    # results_y_abr = results_y[['position','grid','driverName']].sort_values(['position','grid','driverName'])
+    # results_y_abr['driverGrid'] = \
+    # results_y_abr['driverName'] + ' - ' + results_y_abr['grid'].astype(str)
 
-    results_y_abr.drop(columns=['grid','driverName'],inplace=True) 
+    # results_y_abr.drop(columns=['grid','driverName'],inplace=True) 
 
     results_yp = results_year_pstn[['driverId',\
         'driverName','raceId','grid','position','code','dob','nationality']]
     results_yp_abr = results_yp[['position','driverName']].sort_values(['position','driverName'])
     
-    results_ypd = results_year_pstn_driver[['driverId',\
-        'driverName','raceId','grid','position','code','dob','nationality']]
-    results_ypd_abr = results_ypd[['position','driverName']].sort_values('position')
+    # results_ypd = results_year_pstn_driver[['driverId',\
+    #     'driverName','raceId','grid','position','code','dob','nationality']]
+    # results_ypd_abr = results_ypd[['position','driverName']].sort_values('position')
 
     # year weights
 
-    d_g_list = []
+    # d_g_list = []
 
-    curr_d_g = list(results_y_abr.iloc[0,:]) + [1]
+    # curr_d_g = list(results_y_abr.iloc[0,:]) + [1]
 
-    for i in range(1,len(results_y_abr['position'])):
-        if results_y_abr['position'].iloc[i] == results_y_abr['position'].iloc[i-1]:
-            if results_y_abr['driverGrid'].iloc[i] == results_y_abr['driverGrid'].iloc[i-1]:
-                curr_d_g[2] += 1
-            else:
-                d_g_list.append(curr_d_g)
-                curr_d_g = list(results_y_abr.iloc[i,:]) + [1]
-        else:
-            d_g_list.append(curr_d_g)
-            curr_d_g = list(results_y_abr.iloc[i,:]) + [1]
+    # for i in range(1,len(results_y_abr['position'])):
+    #     if results_y_abr['position'].iloc[i] == results_y_abr['position'].iloc[i-1]:
+    #         if results_y_abr['driverGrid'].iloc[i] == results_y_abr['driverGrid'].iloc[i-1]:
+    #             curr_d_g[2] += 1
+    #         else:
+    #             d_g_list.append(curr_d_g)
+    #             curr_d_g = list(results_y_abr.iloc[i,:]) + [1]
+    #     else:
+    #         d_g_list.append(curr_d_g)
+    #         curr_d_g = list(results_y_abr.iloc[i,:]) + [1]
 
-    d_g_list.append(curr_d_g)
+    # d_g_list.append(curr_d_g)
 
-    d_g_frame = pd.DataFrame(d_g_list,columns=['position','name','weight'])\
-        .sort_values(['position','weight'],ascending=[True,False])
+    # d_g_frame = pd.DataFrame(d_g_list,columns=['position','name','weight'])\
+    #     .sort_values(['position','weight'],ascending=[True,False])
 
-    labels_d_g_line = list(d_g_frame['name'])+list(d_g_frame['position'])
-    labels_d_g_uni_line = list(dict.fromkeys(labels_d_g_line))
-    labels_d_g_final = [labels_d_g_uni_line.index(x) for x in labels_d_g_line]
-    weights_d_g_final = list(d_g_frame['weight'])    
+    # labels_d_g_line = list(d_g_frame['name'])+list(d_g_frame['position'])
+    # labels_d_g_uni_line = list(dict.fromkeys(labels_d_g_line))
+    # labels_d_g_final = [labels_d_g_uni_line.index(x) for x in labels_d_g_line]
+    # weights_d_g_final = list(d_g_frame['weight'])    
 
     # position weights
 
@@ -361,38 +361,38 @@ def display_sankey(year,drivID,pstn):
 
 #weightsyear grid driver
 
-    posit_list = []
+    # posit_list = []
 
-    curr_posit = list(results_ypd_abr.iloc[0,:]) + [1]
+    # curr_posit = list(results_ypd_abr.iloc[0,:]) + [1]
 
-    for i in range(1,len(results_ypd_abr['position'])):
-        if results_ypd_abr['position'].iloc[i] == results_ypd_abr['position'].iloc[i-1]:
-            curr_posit[2] += 1
-        else:
-            posit_list.append(curr_posit)
-            curr_posit = list(results_ypd_abr.iloc[i,:]) + [1]
+    # for i in range(1,len(results_ypd_abr['position'])):
+    #     if results_ypd_abr['position'].iloc[i] == results_ypd_abr['position'].iloc[i-1]:
+    #         curr_posit[2] += 1
+    #     else:
+    #         posit_list.append(curr_posit)
+    #         curr_posit = list(results_ypd_abr.iloc[i,:]) + [1]
 
-    posit_list.append(curr_posit)
+    # posit_list.append(curr_posit)
 
-    posit_frame = pd.DataFrame(posit_list,columns=['position','name','weight'])\
-        .sort_values(['position','weight'],ascending=[True,False])
+    # posit_frame = pd.DataFrame(posit_list,columns=['position','name','weight'])\
+    #     .sort_values(['position','weight'],ascending=[True,False])
 
-    labels_line = list(posit_frame['name'])+list(posit_frame['position'])
-    labels_uni_line = list(dict.fromkeys(labels_line))
-    labels_final = [labels_uni_line.index(x) for x in labels_line]
-    weights_final = list(posit_frame['weight'])
+    # labels_line = list(posit_frame['name'])+list(posit_frame['position'])
+    # labels_uni_line = list(dict.fromkeys(labels_line))
+    # labels_final = [labels_uni_line.index(x) for x in labels_line]
+    # weights_final = list(posit_frame['weight'])
 
     fig = go.Figure(data=[go.Sankey(
         node = dict(
         pad = 15,
         thickness = 20,
         line = dict(color = "black", width = 0.5),
-        label = labels_uni_line
+        label = labels_driver_uni_line
         ),
         link = dict(
-        source = labels_final[:len(labels_final)//2], # indices correspond to labels, eg A1, A2, A1, B1, ...
-        target = labels_final[len(labels_final)//2:],
-        value = weights_final
+        source = labels_driver_final[:len(labels_driver_final)//2], # indices correspond to labels, eg A1, A2, A1, B1, ...
+        target = labels_driver_final[len(labels_driver_final)//2:],
+        value = weights_driver_final
     ))])
 
     fig.update_layout(title_text="Placings in "+str(year)+\
