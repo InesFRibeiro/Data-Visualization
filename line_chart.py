@@ -38,7 +38,7 @@ races.drop(races[races['year']==2022].index, inplace=True)
 
 ##### NEW DFS E CENAS ##########################################################################################
 
-#palette = [i for i in sns.color_palette('viridis', 20).as_hex()]
+palette = [i for i in sns.color_palette('hls', 25).as_hex()]
 
 team_pos_races = pd.merge(constructor_standings, 
                       races, 
@@ -98,28 +98,27 @@ circuits = list(set(np.array(df_2['circuit'])))
 years_circuits = list(set(np.array(lap_times_2['year'])))
 
 
-# options_year = [{'label':i, 'value':i} for i in years]
-# options_year = sorted(options_year, key=lambda x: x["label"])
+##### Choices #################################################################################################
+drop_scatter_years = dcc.Dropdown(id = 'scatter_years',
+                                multi = False,
+                                clearable = True,
+                                disabled = False,
+                                style = {'display': True},
+                                value = 1996,
+                                placeholder = 'Select Year',
+                                options = [{'label': c, 'value': c}
+                                        for c in years_circuits], className = 'dcc_compon')
 
-# # options for the first bar race chart
-# options_circuit = [{'label':i, 'value':i} for i in circuits]
-# options_circuit = sorted(options_circuit, key=lambda x: x["label"])
+drop_scatter_circuits = dcc.Dropdown(id = 'scatter_circuits',
+                                    multi = False,
+                                    clearable = True,
+                                    disabled = False,
+                                    style = {'display': True},
+                                    placeholder = 'Select Circuit',
+                                    options = [], className = 'dcc_compon')
 
 
-##### DROPDOWN/SLIDERS/ETC ####################################################################################
 
-# dropdown_year = dcc.Dropdown(
-#                             id='drop_year',
-#                             options=options_year#,
-#                             #value=2021
-#                             )
-
-# # dropdown for the first bar race chart
-# dropdown_circuit = dcc.Dropdown(
-#                             id='drop_circuit',
-#                             options=options_circuit#,
-#                             #value='A1-Ring'
-#                             )
 
 
 ##### APP #####################################################################################################
@@ -135,25 +134,10 @@ app.layout = html.Div([
     html.Div([
         html.Div([
             html.P('Select Year:', className = 'fix_label', style = {'color': 'black'}),
-            dcc.Dropdown(id = 'w_years',
-                         multi = False,
-                         clearable = True,
-                         disabled = False,
-                         style = {'display': True},
-                         value = 1996,
-                         placeholder = 'Select Year',
-                         options = [{'label': c, 'value': c}
-                                    for c in years_circuits], className = 'dcc_compon'),
+            drop_scatter_years,
 
             html.P('Select Circuit:', className = 'fix_label', style = {'color': 'black'}),
-            dcc.Dropdown(id = 'w_circuits1',
-                         multi = False,
-                         clearable = True,
-                         disabled = False,
-                         style = {'display': True},
-                         placeholder = 'Select Circuit',
-                         options = [], className = 'dcc_compon'),
-
+            drop_scatter_circuits,
 
         ], className = "create_container three columns"),
 
@@ -172,33 +156,33 @@ app.layout = html.Div([
 ##### CALLBACKS ###############################################################################################
 
 @app.callback(
-    Output('w_circuits1', 'options'),
-    Input('w_years', 'value'))
-def get_circuit_options(w_years):
-    df_3 = df_1[df_1['year'] == w_years]
+    Output('scatter_circuits', 'options'),
+    Input('scatter_years', 'value'))
+def get_circuit_options(scatter_years):
+    df_3 = df_1[df_1['year'] == scatter_years]
     return [{'label': i, 'value': i} for i in sorted(list(set(df_3['circuit'])))]
 
 
 @app.callback(
-    Output('w_circuits1', 'value'),
-    Input('w_circuits1', 'options'))
-def get_circuit_value(w_circuits1):
-    return [k['value'] for k in w_circuits1][0]
+    Output('scatter_circuits', 'value'),
+    Input('scatter_circuits', 'options'))
+def get_circuit_value(scatter_circuits):
+    return [k['value'] for k in scatter_circuits][0]
 
 
 
 @app.callback(Output('scatter_plot', 'figure'),
-              [Input('w_years', 'value')],
-              [Input('w_circuits1', 'value')])
+              [Input('scatter_years', 'value')],
+              [Input('scatter_circuits', 'value')])
 
 
 
 ##### Visualizations ##########################################################################################
 
-def callback_1(w_years, w_circuits1):
+def callback_1(scatter_years, scatter_circuits):
     ############# Scatter (line) plot #########################################################################
     race = races.copy()
-    race =  df_1.loc[(df_1['year']==w_years) & (df_1['circuit']==w_circuits1)]['raceId'].values[0]
+    race =  df_1.loc[(df_1['year']==scatter_years) & (df_1['circuit']==scatter_circuits)]['raceId'].values[0]
     
     #dataframe of lap_times for that race
     pos_per_lap = lap_times[lap_times['raceId']==race]  
@@ -216,10 +200,25 @@ def callback_1(w_years, w_circuits1):
    
     layout_ppl = dict(title=dict(text='Position of the drivers in each lap of this race'),
                       xaxis=dict(title='Lap'),
-                      yaxis=dict(title='Position'))
+                      yaxis=dict(title='Position'),
+                      plot_bgcolor='#2d3035', paper_bgcolor='#2d3035',
+                      title_font=dict(size=25, color='#a5a7ab', family="Lato, sans-serif"),
+                      font=dict(color='#8a8d93'))
 
     fig_ppl = go.Figure(data=data_ppl, layout=layout_ppl)
-    
+    # fig_ppl.update_layout(#margin=dict(t=70, b=0, l=70, r=40),
+    #                     #hovermode="x unified",
+    #                     #xaxis_tickangle=360,
+    #                     #title=f"Number of wins of each constructor from 1950-2021",
+    #                     #xaxis_title='Constructor ', yaxis_title="#Wins",
+    #                     plot_bgcolor='#2d3035', paper_bgcolor='#2d3035',
+    #                     title_font=dict(size=25, color='#a5a7ab', family="Lato, sans-serif"),
+    #                     font=dict(color='#8a8d93'),
+    #                     #legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+    #                       )
+    fig_ppl.update_xaxes(showgrid=False)
+    fig_ppl.update_yaxes(showgrid=False)
+
     x_max = pos_per_lap['lap'].max()
     fig_ppl.update_xaxes(range=(1,x_max))
 
