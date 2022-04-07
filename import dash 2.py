@@ -34,11 +34,12 @@ status = pd.read_csv(path + 'status.csv')
 # pstn = 1
 # drivID = 830
 
-results['position'].replace(to_replace='\\N',value=21,inplace=True)
+results['position'].replace(to_replace='\\N',value='DNF',inplace=True)
+#results['grid'].replace(to_replace=0,value='Pit',inplace=True)
 results_driver = results.merge(drivers[['driverId','driverRef','forename','surname','code','dob','nationality']],left_on='driverId',right_on='driverId')
 results_driver.insert(len(results_driver.columns),'driverName',results_driver['forename']+' '+results_driver['surname'])
 results_driver.drop(columns=['forename','surname'],axis=1,inplace=True)
-results_driver['position']=results_driver['position'].astype(int)
+#results_driver['position']=results_driver['position'].astype(int)
 
 #### Year
 
@@ -189,10 +190,18 @@ slider_pstn = dcc.Slider(
         step=1
     )
 
+radio_pstn = dcc.RadioItems(
+        id='pstn',
+        options= [dict(label="Pit", value=0)] + \
+            [dict(label=str(pos), value=pos) \
+                for pos in np.sort(results['grid'].unique())[1:]],
+        value=1
+    )
+
 # dropdown_driver = dcc.Dropdown(
 #         id='drivID',
 #         options=[]
-#       #  multi=True
+#         multi=True
 #     )
 
 app = Dash(__name__)
@@ -219,7 +228,7 @@ app.layout = html.Div([
 
             html.P('Select Driver:', className = 'fix_label', style = {'color': 'black'}),
             dcc.Dropdown(id = 'drivID',
-                         multi = False,
+                         multi = True,
                          clearable = True,
                          disabled = False,
                          style = {'display': True},
@@ -228,8 +237,8 @@ app.layout = html.Div([
 
 
         ]), 
-    html.Label('Position Slider'),
-        slider_pstn        
+    html.Label('Select Starting Position:'),
+        radio_pstn        
     ]),
 
     # html.Label('Year Choice'),
@@ -394,9 +403,12 @@ def display_sankey(year,drivID,pstn):
         target = labels_driver_final[len(labels_driver_final)//2:],
         value = weights_driver_final
     ))])
-
+    if pstn==0:
+        pstn_print='the pit lane'
+    else:
+        pstn_print='position '+str(pstn)
     fig.update_layout(title_text="Placings in "+str(year)+\
-    " starting at position "+str(pstn), font_size=10)
+    " starting at "+str(pstn_print), font_size=10)
     return fig
 
 if __name__ == "__main__":
