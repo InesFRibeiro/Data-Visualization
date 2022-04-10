@@ -179,25 +179,52 @@ def get_circuit_value(scatter_circuits):
 
 ##### Visualizations ##########################################################################################
 
+
 def callback_1(scatter_years, scatter_circuits):
     ############# Scatter (line) plot #########################################################################
     race = races.copy()
     race =  df_1.loc[(df_1['year']==scatter_years) & (df_1['circuit']==scatter_circuits)]['raceId'].values[0]
     
-    #dataframe of lap_times for that race
+    # dataframe of lap_times for that race
     pos_per_lap = lap_times[lap_times['raceId']==race]  
 
-    driver_ids = np.unique(pos_per_lap['driverId'].values).tolist() #list of the ids of the drivers in that race
-    driver_names = [drivers.loc[drivers['driverId']==name]['surname'].values[0] for name in driver_ids] #names of the drivers
-    driver_dict = {driver_ids[i]: driver_names[i] for i in range(len(driver_ids))} #dictionary with ids and names
+    # df w/ raceId, driverID, lap, position, constructors (& id) and the index of the constructor in this race
+    driver_team = pos_per_lap.copy()
+    driver_team.drop(columns=['time','milliseconds'], inplace=True)
+    driver_team = driver_team.merge(qualifying[['raceId', 'driverId', 'constructorId']], on=['raceId', 'driverId'])
+    driver_team = driver_team.merge(constructors[['constructorId', 'name']], on='constructorId')
+    driver_team.rename(columns={'name':'constructor'}, inplace=True)
+    driver_team['constructor_index'] = 100
 
+    # list w/ the names of the teams that participated in this race
+    team_names = np.unique(driver_team['constructor'].values).tolist()
+    for i in team_names:
+        driver_team['constructor_index'] = np.where(driver_team['constructor']==i, team_names.index(i),driver_team['constructor_index'])
+
+    # list with the ids of the drivers in this race
+    driver_ids = np.unique(pos_per_lap['driverId'].values).tolist()
+    # list with the names of the drivers in this race
+    driver_names = [drivers.loc[drivers['driverId']==drivId]['surname'].values[0] for drivId in driver_ids]
+
+    # list of the constructor of each driver (length == #drivers)
+    driv_team = [driver_team.loc[driver_team['driverId']==drivId]['constructor'].values[0] for drivId in driver_ids]
+    # list w/ the index of the constructor of each driver in this race
+    team_index = [driver_team.loc[driver_team['driverId']==drivId]['constructor_index'].values[0] for drivId in driver_ids]
+
+    # dict w/ ids of the drivers as the keys and a list with drivers names, team index and team name as the values
+    driver_dict = {driver_ids[i]: [driver_names[i], driv_team[i], team_index[i]] for i in range(len(driver_ids))} 
+    driver_dict = dict(sorted(driver_dict.items(), key=lambda x: x[1][1]))
+
+    colors = ['red', 'gold', 'darkorange', 'forestgreen', 'lightgray', 'turquoise', 'dodgerblue','blue','blueviolet','hotpink','black']
+    
 
     data_ppl = [dict(type='scatter',
-                 x=pos_per_lap[pos_per_lap['driverId']==driver]['lap'],
-                 y=pos_per_lap[pos_per_lap['driverId']==driver]['position'],
-                 name=name)#, line=dict(color= palette.pop(0)))
-                                for driver, name in driver_dict.items()]
-   
+                x=pos_per_lap[pos_per_lap['driverId']==driverid]['lap'],
+                y=pos_per_lap[pos_per_lap['driverId']==driverid]['position'],
+                name = name[0]+ ' - ' + name[1] , line=dict(color= colors[name[2]]))
+                            for driverid, name in driver_dict.items()]
+
+
     layout_ppl = dict(title=dict(text='Position of the drivers in each lap of this race'),
                       xaxis=dict(title='Lap'),
                       yaxis=dict(title='Position'),
