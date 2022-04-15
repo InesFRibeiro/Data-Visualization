@@ -287,24 +287,24 @@ app.layout = html.Div([
                 label = "Per starting position",\
                 children=[
                 html.Div([
-                    html.P('Select Year:', className = 'fix_label', style = {'color': 'white'}),
+                    html.P('Year:', className = 'fix_label', style = {'color': 'white'}),
                     dcc.Dropdown(id = 'year_sankey',
                                     multi = False,
                                     clearable = True,
                                     disabled = False,
-                                    style = {'display': True},
+                                    style = {'display': True, 'width':'40%'},
                                     value = 2021,
                                     placeholder = 'Select Year',
                                     options = [{'label': c, 'value': c}
                                                 for c in years_list], className = 'dcc_compon'),
 
-                    html.P('Select Starting Position:', className = 'fix_label', style = {'color': 'white'}),
+                    html.P('Starting Position:', className = 'fix_label', style = {'color': 'white'}),
                     dcc.Dropdown(id = 'pstn',
                                     multi = False,
                                     value = 1,
-                                    style = {'display': True},
+                                    style = {'display': True, 'width':'60%'},
                                     options = [], className = 'dcc_compon')
-                ]), 
+                ], style={'display':'flex', 'width':'95%', 'margin-left': '3.5vw'}), 
                 html.Br(),
 
                 dcc.Graph(id="graph2")
