@@ -1,18 +1,18 @@
 
 
 body {
-  background-color: #2d3035;
+  background-color: #2d3035f6;
   margin: 5%;
 }
 
 
 .create_container {
-  border: 3px solid #ffffff;
+  border-radius: 0px;
+  background-color: #2d3035;
   margin: 18px;
   padding: 15px;
   position: relative;
   box-shadow: 2px 2px 2px #010915;
-  background-color: #2d3035;
 }
 
 .dcc_compon {
@@ -58,11 +58,11 @@ body {
 }
 
 .Select-control{
-  border: 0.5px solid rgb(255, 255, 255);
+  border: 0px solid green;
 }
 
 .has-value.Select--single>.Select-control .Select-value .Select-value-label, .has-value.is-pseudo-focused.Select--single>.Select-control .Select-value .Select-value-label {
-  color: rgb(255, 255, 255);
+  color: white;
 }
 
 /* width */
@@ -85,7 +85,7 @@ body {
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: rgb(255, 255, 255) !important;
+  background: white !important;
 }
 
 .rc-slider-track {
@@ -110,11 +110,8 @@ body {
   border-color: red;
 }
 
-
-
-
 .custom-tabs-container {
-  width: 85%;
+  width: 95%;
 }
 .custom-tabs {
   border-top-left-radius: 200px !important;
@@ -143,4 +140,3 @@ body {
   background-color: #8e8e8f !important;
   border-top: 3px solid #ffffff !important;
 }
-

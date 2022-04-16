@@ -32,6 +32,7 @@ results = pd.read_csv(path + 'results.csv')
 seasons = pd.read_csv(path + 'seasons.csv')
 sprint_results = pd.read_csv(path + 'sprint_results.csv')
 status = pd.read_csv(path + 'status.csv')
+drivers_countries = pd.read_csv(path +'drivers_country.csv')
 
 ##### Correcting some data ###################################################################################
 circuits['country'].replace('United States', 'USA', inplace=True)
@@ -101,6 +102,9 @@ df_1['win'] = np.where(df_1['position']==1, 1, 0)
 df_2 = df_1.groupby(['Period','constructor', 'circuit', 'Grand Prix'], as_index=False)['win'].sum()
 df_2.rename(columns={'win':'win_period'}, inplace=True)
 
+drivers_countries = drivers_countries.groupby('country').count()['driverId'].to_frame()
+drivers_countries.reset_index(inplace=True)
+
 
 lap_times_2 = lap_times.merge(df_1[['raceId', 'circuitId', 'circuit', 'year']], on='raceId')
 
@@ -129,7 +133,7 @@ drop_scatter_years = dcc.Dropdown(id = 'scatter_years',
                                 multi = False,
                                 clearable = True,
                                 disabled = False,
-                                style = {'display': True, 'width':'40%'},
+                                style = {'display': True},
                                 value = 2021,
                                 placeholder = 'Select Year',
                                 options = [{'label': c, 'value': c}
@@ -139,7 +143,7 @@ drop_scatter_circuits = dcc.Dropdown(id = 'scatter_circuits',
                                     multi = False,
                                     clearable = True,
                                     disabled = False,
-                                    style = {'display': True, 'width':'60%'},
+                                    style = {'display': True},
                                     placeholder = 'Select Circuit',
                                     options = [], className = 'dcc_compon')
 
@@ -152,25 +156,26 @@ def bar_chart():
                     color_discrete_sequence=['red'])
     fig_bar.update_yaxes(showgrid=False),
     fig_bar.update_xaxes(categoryorder='total descending')
-    fig_bar.update_layout(margin=dict(t=70, b=0, l=70, r=40),
+    fig_bar.update_layout(margin=dict(t=50, b=0, l=90, r=40),
                             xaxis_tickangle=360,
-                            title=f"Number of wins of each constructor from 1950-2021 in each circuit",
+                            title={'text': "Number of wins of each constructor from 1950-2021 in each circuit",
+                            'y':1},
+                            # title=f"Number of wins of each constructor from 1950-2021 in each circuit",
                             xaxis_title='Constructor ', yaxis_title="Number of Wins",
                             plot_bgcolor='#2d3035', paper_bgcolor='#2d3035',
-                            title_font=dict(size=25, color='white', family="Lato, sans-serif"),
+                            title_font=dict(size=18, color='white', family="Lato, sans-serif"),
                             font=dict(color='white'), 
                             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
                             )
     return fig_bar
 
 
-def choropleth():
+def map():
     fig = go.Figure(data=go.Choropleth(
         locations=country_races['country'], # Spatial coordinates
         z = country_races['nr_races'],
         locationmode = 'country names', 
         text=country_races['nr_races'],
-        colorbar_title = "nr races",
         hoverinfo="location+z",
         colorscale='reds',
         reversescale=False,
@@ -184,21 +189,59 @@ def choropleth():
     )
 
     fig.update_layout(
-        title_text = 'Number of Races per Country', 
+        title={'text': "Number of Races per Country",'y':1},
         plot_bgcolor='#2d3035', paper_bgcolor='#2d3035',
-        title_font=dict(size=25, color='white', family="Lato, sans-serif"),
+        title_font=dict(size=18, color='white', family="Lato, sans-serif"),
         font=dict(color='white'), 
-        margin=dict(l=5, r=5, t=35, b=20)
+        margin=dict(l=0, r=0, t=35, b=15)
         )
 
     return fig
 
+def globe():
+    fig = go.Figure(data=go.Choropleth(
+        locations=drivers_countries['country'], # Spatial coordinates
+        z = drivers_countries['driverId'],
+        locationmode = 'country names', 
+        colorscale='reds',
+        reversescale=False,
+        ),
+        layout=dict(geo=dict(scope='world',
+                            projection=dict(type='orthographic'),
+                            landcolor='white',
+                            showocean=True,
+                            oceancolor='skyblue'
+                            )
+        )
+    )
+
+    fig.update_layout(
+        title={'text': "Number of Drivers per Country",'y':1},
+        plot_bgcolor='#2d3035', paper_bgcolor='#2d3035',
+        title_font=dict(size=18, color='white', family="Lato, sans-serif"),
+        font=dict(color='white'), 
+        margin=dict(l=0, r=0, t=30, b=10),
+        geo=dict(bgcolor= 'rgba(0,0,0,0)')
+        )
+
+    return fig
 
 ##### APP #####################################################################################################
 app = dash.Dash(__name__)
 server = app.server
 
 
+def podium(year, circuit):
+    race = races.loc[(races['year']==year) & (races['circuitId']==circuit)]['raceId'].values[0]
+    top_3 = driver_standings[(driver_standings['raceId']==race) & 
+                 ((driver_standings['position']==1) | (driver_standings['position']==2) | (driver_standings['position']==3))]
+    top_3 = top_3.merge(drivers[['driverId', 'surname']], on='driverId')
+    top_3.sort_values(by='position', inplace=True)
+    
+    return list(top_3['surname'])
+
+
+trends = ['a','b','c']
 app.layout = html.Div([
     html.H1('Formula 1 - Trends & Performance', style = {'color': 'white'}),
 
@@ -216,35 +259,53 @@ app.layout = html.Div([
     html.Br(),
 
     html.Div([
-        dcc.Graph(id='globe_plot', 
-                figure = choropleth()
+        dcc.Graph(id='map', 
+                figure = map()
                 )
         ], className = "create_container six columns", style={'width':'100%'}),
 
     html.Br(),
 
     html.Div([
-        dcc.Graph(id='bar_chart_plot', 
-                figure = bar_chart()
-                )
-    ], className = "create_container six columns", style={'width':'100%'}),
-    
+        html.Div([
+            dcc.Graph(id='bar_chart_plot', 
+                    figure = bar_chart()
+                    )
+        ], className = "create_container six columns"),
+
+        html.Div([
+            dcc.Graph(id='globe', 
+                    figure = globe()
+                    )
+        ], className = "create_container six columns")
+    ],className = "row flex-display", style={'width':'103%'}),
 
     html.Br(),
 
     html.Div([
         html.Div([
-            html.P('Year:', className = 'fix_label', style = {'color': 'white'}),
-            drop_scatter_years,
+                html.P('Year:', className = 'fix_label', style = {'color': 'white'}),
+                drop_scatter_years,
 
-            html.P('Circuit:', className = 'fix_label', style = {'color': 'white'}),
-            drop_scatter_circuits
-        ], style={'display':'flex', 'width':'95%', 'margin-left': '3.5vw'}),
+                html.P('Circuit:', className = 'fix_label', style = {'color': 'white'}),
+                drop_scatter_circuits,
 
-        dcc.Graph(id = 'scatter_plot',
-                    config = {'displayModeBar': 'hover'}) 
+                html.Br(),
+                
+                # html.P(podium(drop_scatter_years, drop_scatter_circuits)[0],style = {'color': 'white'}),
+                # html.P('2nd Place:',style = {'color': 'white'}),
+                # html.P('3rd Place:',style = {'color': 'white'}),
+                
+                html.Br(),
 
-    ], className = "create_container six columns", style={'width':'100%'}),
+                html.P('*This visualization only contains information from 1996 to 2021', style = {'color': 'white'})
+                ], className = "create_container three columns", style={'width':'20%'}),
+
+        html.Div([
+                dcc.Graph(id = 'scatter_plot',
+                        config = {'displayModeBar': 'hover'})
+        ], className = "create_container six columns", style={'width':'80%'})
+    ], className = "row flex-display", style={'width':'103%'}),
 
     html.Br(),
 
@@ -298,11 +359,12 @@ app.layout = html.Div([
                                     options = [{'label': c, 'value': c}
                                                 for c in years_list], className = 'dcc_compon'),
 
-                    html.P('Starting Position:', className = 'fix_label', style = {'color': 'white'}),
+                    html.P('Grid:', className = 'fix_label', style = {'color': 'white'}),
                     dcc.Dropdown(id = 'pstn',
                                     multi = False,
-                                    value = 1,
                                     style = {'display': True, 'width':'60%'},
+                                    value = '1',
+                                    placeholder = 'Select Starting Position',
                                     options = [], className = 'dcc_compon')
                 ], style={'display':'flex', 'width':'95%', 'margin-left': '3.5vw'}), 
                 html.Br(),
@@ -315,12 +377,13 @@ app.layout = html.Div([
     
     html.Br(),
     html.Br(),
-
-    html.P('Authors: Inês Ribeiro, m20210595; J. Daniel Conde, José Dias, m20211009; m20210656; Matias Neves, m20211000',
-        style = {'color': 'white'}),
-    html.Br(),
-    html.P('Dataset source: https://www.kaggle.com/rohanrao/formula-1-world-championship-1950-2020?select=results.csv',
-        style = {'color': 'white'})
+    html.Div([
+        html.P(
+            'Authors: Inês Ribeiro, m20210595; J. Daniel Conde, José Dias, m20211009; m20210656; Matias Neves, m20211000',
+            style = {'color': 'white'}),
+        html.P('Dataset source:', style = {'color': 'white'}),
+        html.A('Kaggle', href='https://www.kaggle.com/rohanrao/formula-1-world-championship-1950-2020?select=results.csv')
+    ])
 ], id = "mainContainer", style = {"display": "flex", "flex-direction": "column"})
 
 
@@ -392,12 +455,13 @@ def line_chart(scatter_years, scatter_circuits):
                             for driverid, name in driver_dict.items()]
 
 
-    layout_ppl = dict(title=dict(text='Position of the drivers in each lap of this race'),
-                      xaxis=dict(title='Lap'),
-                      yaxis=dict(title='Position'),
-                      plot_bgcolor='#2d3035', paper_bgcolor='#2d3035',
-                      title_font=dict(size=25, color='white', family="Lato, sans-serif"),
-                      font=dict(color='white'))
+    layout_ppl = dict(
+                    title={'text':'Position of the drivers in each lap of this race','y':1},
+                    xaxis=dict(title='Lap'),
+                    yaxis=dict(title='Position'),
+                    plot_bgcolor='#2d3035', paper_bgcolor='#2d3035',
+                    title_font=dict(size=18, color='white', family="Lato, sans-serif"),
+                    font=dict(color='white'))
 
     fig_ppl = go.Figure(data=data_ppl, layout=layout_ppl)
 
@@ -408,6 +472,17 @@ def line_chart(scatter_years, scatter_circuits):
     fig_ppl.update_xaxes(range=(1,x_max))
 
     return fig_ppl
+
+
+
+# def podium(year, circuit):
+#     race = races.loc[(races['year']==year) & (races['circuitId']==circuit)]['raceId'].values[0]
+#     top_3 = driver_standings[(driver_standings['raceId']==race) & 
+#                  ((driver_standings['position']==1) | (driver_standings['position']==2) | (driver_standings['position']==3))]
+#     top_3 = top_3.merge(drivers[['driverId', 'surname']], on='driverId')
+#     top_3.sort_values(by='position', inplace=True)
+    
+#     return list(top_3['surname'])
 
 
 ###############################################################################################################
@@ -503,7 +578,9 @@ def display_sankey(year,drivName):
         ))])
 
         fig.update_layout(title_text="Starting positions and placings of "\
-        + drivName + " in "+str(year), font=dict(size = 10, color = 'white'),
+        + drivName + " in "+str(year), title={'y':1},
+        title_font=dict(size=18, color='white', family="Lato, sans-serif"),
+        font=dict(size = 18, color = 'white', family="Lato, sans-serif"),
         plot_bgcolor='#2d3035', paper_bgcolor='#2d3035')
     
         return fig
@@ -573,7 +650,8 @@ def display_sankey_2(year_sankey,pstn):
         pstn_print='position '+str(pstn)
     
     fig.update_layout(title_text = f'Placings in {str(year_sankey)} starting at {str(pstn_print)}',
-    font=dict(size = 10, color = 'white'),
+    title_font=dict(size=18, color='white', family="Lato, sans-serif"),
+    font=dict(size = 18, color = 'white', family="Lato, sans-serif"), title={'y':1},
         plot_bgcolor='#2d3035', paper_bgcolor='#2d3035')
 
 
