@@ -305,7 +305,7 @@ app.layout = html.Div([
                 label = "Per starting position",\
                 children=[
                 html.Div([
-                    html.P('Year:', className = 'fix_label', style = {'color': 'white'}),
+                    html.P('Year:', className = 'fix_label', style = {'color': 'white', 'font-size':'16px'}),
                     dcc.Dropdown(id = 'year_sankey',
                                     multi = False,
                                     clearable = True,
@@ -316,7 +316,7 @@ app.layout = html.Div([
                                     options = [{'label': c, 'value': c}
                                                 for c in years_list], className = 'dcc_compon'),
 
-                    html.P('Grid:', className = 'fix_label', style = {'color': 'white'}),
+                    html.P('Grid:', className = 'fix_label', style = {'color': 'white', 'font-size':'16px'}),
                     dcc.Dropdown(id = 'pstn',
                                     multi = False,
                                     style = {'display': True, 'width':'60%'},
