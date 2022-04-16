@@ -9,8 +9,6 @@ import seaborn as sns
 import plotly.graph_objs as go
 import plotly.express as px
 import plotly.io as pio
-#from raceplotly.plots import barplot
-# from plotly.subplots import make_subplots
 
 
 # https://htmlcheatsheet.com/css/
@@ -39,7 +37,7 @@ circuits['country'].replace('United States', 'USA', inplace=True)
 races.drop(races[races['year']==2022].index, inplace=True)
 
 
-##### NEW DFS E CENAS ########################################################################################
+##### NEW DFS ################################################################################################
 team_pos_races = pd.merge(constructor_standings, 
                       races, 
                       on ='raceId', 
@@ -75,39 +73,10 @@ df['wins (total)'] = np.where(df['position']==1, 1, 0)
 df_3 = df.groupby(['circuit', 'constructor' ], as_index=False)['wins (total)'].sum()
 df_3.rename(columns={'circuit':'Circuit', 'constructor':'Constructor'}, inplace=True)
 
-df_1 = df[['raceId','constructorId', 'constructor', 'circuitId', 'Grand Prix', 'circuit','position','year']]
-
-df_1['61-65'] = np.where((df_1['year']>=1961)&(df_1['year']<=1965), 1, 0)
-df_1['66-86'] = np.where((df_1['year']>=1966)&(df_1['year']<=1986), 1, 0)
-df_1['87-88'] = np.where((df_1['year']>=1987)&(df_1['year']<=1988), 1, 0)
-df_1['89-94'] = np.where((df_1['year']>=1989)&(df_1['year']<=1994), 1, 0)
-df_1['95-05'] = np.where((df_1['year']>=1995)&(df_1['year']<=2005), 1, 0)
-df_1['06-13'] = np.where((df_1['year']>=2006)&(df_1['year']<=2013), 1, 0)
-df_1['14-21'] = np.where((df_1['year']>=2014)&(df_1['year']<=2021), 1, 0)
-
-df_1['Period'] = 0
-df_1['Period'] = np.where(df_1['61-65']==1,'1961-1965', df_1['Period'])
-df_1['Period'] = np.where(df_1['66-86']==1,'1966-1986', df_1['Period'])
-df_1['Period'] = np.where(df_1['87-88']==1,'1966-1986', df_1['Period'])
-df_1['Period'] = np.where(df_1['89-94']==1,'1989-1994', df_1['Period'])
-df_1['Period'] = np.where(df_1['95-05']==1,'1995-2005', df_1['Period'])
-df_1['Period'] = np.where(df_1['06-13']==1,'2006-2013', df_1['Period'])
-df_1['Period'] = np.where(df_1['14-21']==1,'2014-2021', df_1['Period'])
-
-df_1.drop(df_1[df_1['Period']=='0'].index, inplace=True)   #observações de 1958-1960
-df_1.drop(columns=['61-65','66-86','87-88', '89-94', '95-05', '06-13', '14-21'], inplace=True)
-df_1['win'] = np.where(df_1['position']==1, 1, 0)
-
-
-df_2 = df_1.groupby(['Period','constructor', 'circuit', 'Grand Prix'], as_index=False)['win'].sum()
-df_2.rename(columns={'win':'win_period'}, inplace=True)
-
 drivers_countries = drivers_countries.groupby('country').count()['driverId'].to_frame()
 drivers_countries.reset_index(inplace=True)
 
-
-lap_times_2 = lap_times.merge(df_1[['raceId', 'circuitId', 'circuit', 'year']], on='raceId')
-
+lap_times_2 = lap_times.merge(df[['raceId', 'circuitId', 'circuit', 'year']], on='raceId')
 
 results['position'].replace(to_replace='\\N',value='DNF',inplace=True)
 results_driver = results.merge(drivers[['driverId','driverRef','forename','surname','code','dob','nationality']],left_on='driverId',right_on='driverId')
@@ -124,7 +93,7 @@ year_grid = results.merge(races[['raceId', 'year']], on = 'raceId')
 
 ##### OPTIONS #################################################################################################
 years = list(set(np.array(races['year'])))
-circuits = list(set(np.array(df_2['circuit'])))
+circuits = list(set(np.array(df['circuit'])))
 
 years_circuits = list(set(np.array(lap_times_2['year'])))
 
@@ -147,7 +116,7 @@ drop_scatter_circuits = dcc.Dropdown(id = 'scatter_circuits',
                                     placeholder = 'Select Circuit',
                                     options = [], className = 'dcc_compon')
 
-##### Visualization 1 ####################################################################################################
+##### Visualizations ###########################################################################################
 
 def bar_chart():
     fig_bar = px.histogram(df_3, x="Constructor", y="wins (total)",
@@ -160,7 +129,6 @@ def bar_chart():
                             xaxis_tickangle=360,
                             title={'text': "Number of wins of each constructor from 1950-2021 in each circuit",
                             'y':1},
-                            # title=f"Number of wins of each constructor from 1950-2021 in each circuit",
                             xaxis_title='Constructor ', yaxis_title="Number of Wins",
                             plot_bgcolor='#2d3035', paper_bgcolor='#2d3035',
                             title_font=dict(size=22, color='white', family="Lato, sans-serif"),
@@ -231,20 +199,7 @@ app = dash.Dash(__name__)
 server = app.server
 
 
-def podium(year, circuit):
-    race = races.loc[(races['year']==year) & (races['circuitId']==circuit)]['raceId'].values[0]
-    top_3 = driver_standings[(driver_standings['raceId']==race) & 
-                 ((driver_standings['position']==1) | (driver_standings['position']==2) | (driver_standings['position']==3))]
-    top_3 = top_3.merge(drivers[['driverId', 'surname']], on='driverId')
-    top_3.sort_values(by='position', inplace=True)
-    
-    return list(top_3['surname'])
-
-
-trends = ['a','b','c']
 app.layout = html.Div([
-    #html.Img(src=app.get_asset_url('logo.png'), style={'height':'10%', 'width':'10%'}
-#),
     html.H1('Formula 1 - Trends & Performance', style = {'color': 'white', 'font-size' : '69px', 'textAlign':'center'}),
 
     html.Br(),
@@ -293,15 +248,10 @@ app.layout = html.Div([
                 drop_scatter_circuits,
 
                 html.Br(),
-                
-                # html.P(podium(drop_scatter_years, drop_scatter_circuits)[0],style = {'color': 'white'}),
-                # html.P('2nd Place:',style = {'color': 'white'}),
-                # html.P('3rd Place:',style = {'color': 'white'}),
-                
+
                 html.Br(),
 
                 html.P('*This visualization only contains information from 1996 to 2021', style = {'color': 'white'}),
-                #], className = "create_container three columns", style={'width':'20%'}),
 
                 html.Br(),
 
@@ -388,7 +338,6 @@ app.layout = html.Div([
                      **DNF: Did Not Finish', style = {'color':'white'})
                 ], className = "create_container six columns", style={'width':'100%'}),
         
-    #], className = "create_container six columns", style={'width':'100%'}),
     
     html.Br(),
     html.Br(),
@@ -411,7 +360,7 @@ app.layout = html.Div([
     Output('scatter_circuits', 'options'),
     Input('scatter_years', 'value'))
 def get_circuit_options(scatter_years):
-    df_3 = df_1[df_1['year'] == scatter_years]
+    df_3 = df[df['year'] == scatter_years]
     return [{'label': i, 'value': i} for i in sorted(list(set(df_3['circuit'])))]
 
 
@@ -428,9 +377,8 @@ def get_circuit_value(scatter_circuits):
 
 
 def line_chart(scatter_years, scatter_circuits):
-    ############# Scatter (line) plot #########################################################################
     race = races.copy()
-    race =  df_1.loc[(df_1['year']==scatter_years) & (df_1['circuit']==scatter_circuits)]['raceId'].values[0]
+    race =  df.loc[(df['year']==scatter_years) & (df['circuit']==scatter_circuits)]['raceId'].values[0]
     
     # dataframe of lap_times for that race
     pos_per_lap = lap_times[lap_times['raceId']==race]  
@@ -491,17 +439,6 @@ def line_chart(scatter_years, scatter_circuits):
     return fig_ppl
 
 
-
-# def podium(year, circuit):
-#     race = races.loc[(races['year']==year) & (races['circuitId']==circuit)]['raceId'].values[0]
-#     top_3 = driver_standings[(driver_standings['raceId']==race) & 
-#                  ((driver_standings['position']==1) | (driver_standings['position']==2) | (driver_standings['position']==3))]
-#     top_3 = top_3.merge(drivers[['driverId', 'surname']], on='driverId')
-#     top_3.sort_values(by='position', inplace=True)
-    
-#     return list(top_3['surname'])
-
-
 ###############################################################################################################
 @app.callback(
     Output('drivName', 'options'),
@@ -526,7 +463,6 @@ def get_pstn_options(year_sankey):
     return [{'label': 'Pit','value': 0}] + \
         [{'label': i, 'value': i} for i in sorted(list(set(year_grid2['grid']))[1:])]
 
-    #return [{'label': i, 'value': i} for i in sorted(list(set(year_grid2['grid'])))]
 
 
 @app.callback(
@@ -596,7 +532,7 @@ def display_sankey(year,drivName):
         color = 'LightCoral'
         ),
         link = dict(
-        source = labels_final[:len(labels_final)//2], # indices correspond to labels, eg A1, A2, A1, B1, ...
+        source = labels_final[:len(labels_final)//2], 
         target = labels_final[len(labels_final)//2:],
         value = weights_final
         ))])
@@ -665,7 +601,7 @@ def display_sankey_2(year_sankey,pstn):
         color = 'LightCoral'
         ),
         link = dict(
-        source = labels_driver_final[:len(labels_driver_final)//2], # indices correspond to labels, eg A1, A2, A1, B1, ...
+        source = labels_driver_final[:len(labels_driver_final)//2], 
         target = labels_driver_final[len(labels_driver_final)//2:],
         value = weights_driver_final
     ))])
@@ -682,11 +618,6 @@ def display_sankey_2(year_sankey,pstn):
 
 
     return fig
-
-
-
-# external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-# app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 if __name__ == '__main__':
     app.run_server(debug=True) 
