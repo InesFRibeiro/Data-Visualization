@@ -9,7 +9,7 @@ import seaborn as sns
 import plotly.graph_objs as go
 import plotly.express as px
 import plotly.io as pio
-from raceplotly.plots import barplot
+#from raceplotly.plots import barplot
 # from plotly.subplots import make_subplots
 
 
@@ -163,7 +163,7 @@ def bar_chart():
                             # title=f"Number of wins of each constructor from 1950-2021 in each circuit",
                             xaxis_title='Constructor ', yaxis_title="Number of Wins",
                             plot_bgcolor='#2d3035', paper_bgcolor='#2d3035',
-                            title_font=dict(size=18, color='white', family="Lato, sans-serif"),
+                            title_font=dict(size=22, color='white', family="Lato, sans-serif"),
                             font=dict(color='white'), 
                             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
                             )
@@ -191,9 +191,9 @@ def map():
     fig.update_layout(
         title={'text': "Number of Races per Country",'y':1},
         plot_bgcolor='#2d3035', paper_bgcolor='#2d3035',
-        title_font=dict(size=18, color='white', family="Lato, sans-serif"),
+        title_font=dict(size=22, color='white', family="Lato, sans-serif"),
         font=dict(color='white'), 
-        margin=dict(l=0, r=0, t=35, b=15)
+        margin=dict(l=0, r=0, t=35, b=15),
         )
 
     return fig
@@ -218,7 +218,7 @@ def globe():
     fig.update_layout(
         title={'text': "Number of Drivers per Country",'y':1},
         plot_bgcolor='#2d3035', paper_bgcolor='#2d3035',
-        title_font=dict(size=18, color='white', family="Lato, sans-serif"),
+        title_font=dict(size=22, color='white', family="Lato, sans-serif"),
         font=dict(color='white'), 
         margin=dict(l=0, r=0, t=30, b=10),
         geo=dict(bgcolor= 'rgba(0,0,0,0)')
@@ -243,7 +243,9 @@ def podium(year, circuit):
 
 trends = ['a','b','c']
 app.layout = html.Div([
-    html.H1('Formula 1 - Trends & Performance', style = {'color': 'white'}),
+    #html.Img(src=app.get_asset_url('logo.png'), style={'height':'10%', 'width':'10%'}
+#),
+    html.H1('Formula 1 - Trends & Performance', style = {'color': 'white', 'font-size' : '69px', 'textAlign':'center'}),
 
     html.Br(),
 
@@ -284,10 +286,10 @@ app.layout = html.Div([
 
     html.Div([
         html.Div([
-                html.P('Year:', className = 'fix_label', style = {'color': 'white'}),
+                html.P('Year:', className = 'fix_label', style = {'color': 'white', 'font-size':'16px'}),
                 drop_scatter_years,
 
-                html.P('Circuit:', className = 'fix_label', style = {'color': 'white'}),
+                html.P('Circuit:', className = 'fix_label', style = {'color': 'white', 'font-size':'16px'}),
                 drop_scatter_circuits,
 
                 html.Br(),
@@ -298,7 +300,12 @@ app.layout = html.Div([
                 
                 html.Br(),
 
-                html.P('*This visualization only contains information from 1996 to 2021', style = {'color': 'white'})
+                html.P('*This visualization only contains information from 1996 to 2021', style = {'color': 'white'}),
+                #], className = "create_container three columns", style={'width':'20%'}),
+
+                html.Br(),
+
+                html.P('This graph shows driver position in all laps of a race. Drivers with the same colour represent the same team. Lower positions represent higher placements.', style = {'color':'white'})
                 ], className = "create_container three columns", style={'width':'20%'}),
 
         html.Div([
@@ -318,7 +325,7 @@ app.layout = html.Div([
                 label = "Per driver",\
                 children=[
                 html.Div([
-                    html.P('Year:', className = 'fix_label', style = {'color': 'white'}),
+                    html.P('Year:', className = 'fix_label', style = {'color': 'white', 'font-size':'16px'}),
                     dcc.Dropdown(id = 'year',
                                         multi = False,
                                         clearable = True,
@@ -329,7 +336,7 @@ app.layout = html.Div([
                                         options = [{'label': c, 'value': c}
                                                     for c in years_list], className = 'dcc_compon'),
 
-                    html.P('Driver:', className = 'fix_label', style = {'color': 'white'}),
+                    html.P('Driver:', className = 'fix_label', style = {'color': 'white', 'font-size':'16px'}),
                     dcc.Dropdown(id = 'drivName',
                                     multi = False,
                                     clearable = True,
@@ -372,8 +379,16 @@ app.layout = html.Div([
                 dcc.Graph(id="graph2")
             ]),    
 
-        ])
-    ], className = "create_container six columns", style={'width':'100%'}),
+        ]),
+        html.Br(),
+
+        html.P('This graph shows driver position at the start and end of the race.\
+             It can be used to display race consistency.\
+                 *Starting from Pit: Pit Lane Start\
+                     **DNF: Did Not Finish', style = {'color':'white'})
+                ], className = "create_container six columns", style={'width':'100%'}),
+        
+    #], className = "create_container six columns", style={'width':'100%'}),
     
     html.Br(),
     html.Br(),
@@ -382,7 +397,9 @@ app.layout = html.Div([
             'Authors: Inês Ribeiro, m20210595; J. Daniel Conde, José Dias, m20211009; m20210656; Matias Neves, m20211000',
             style = {'color': 'white'}),
         html.P('Dataset source:', style = {'color': 'white'}),
-        html.A('Kaggle', href='https://www.kaggle.com/rohanrao/formula-1-world-championship-1950-2020?select=results.csv')
+        html.A('Kaggle', href='https://www.kaggle.com/rohanrao/formula-1-world-championship-1950-2020?select=results.csv'),
+        html.Br(),
+        html.A('GitHub Countries Dataset', href='https://gist.github.com/zspine/2365808'),
     ])
 ], id = "mainContainer", style = {"display": "flex", "flex-direction": "column"})
 
@@ -460,7 +477,7 @@ def line_chart(scatter_years, scatter_circuits):
                     xaxis=dict(title='Lap'),
                     yaxis=dict(title='Position'),
                     plot_bgcolor='#2d3035', paper_bgcolor='#2d3035',
-                    title_font=dict(size=18, color='white', family="Lato, sans-serif"),
+                    title_font=dict(size=22, color='white', family="Lato, sans-serif"),
                     font=dict(color='white'))
 
     fig_ppl = go.Figure(data=data_ppl, layout=layout_ppl)
@@ -506,7 +523,10 @@ def get_driver_value(drivName):
     Input('year_sankey', 'value'))
 def get_pstn_options(year_sankey):
     year_grid2 = year_grid[year_grid['year'] == year_sankey]
-    return [{'label': i, 'value': i} for i in sorted(list(set(year_grid2['grid'])))]
+    return [{'label': 'Pit','value': 0}] + \
+        [{'label': i, 'value': i} for i in sorted(list(set(year_grid2['grid']))[1:])]
+
+    #return [{'label': i, 'value': i} for i in sorted(list(set(year_grid2['grid'])))]
 
 
 @app.callback(
@@ -562,7 +582,10 @@ def display_sankey(year,drivName):
         labels_final = [labels_uni_line.index(x) for x in labels_line]
         weights_final = list(posit_frame['weight'])
 
-   
+        for lab in range(len(labels_uni_line)):
+            if labels_uni_line[lab] == 0:
+                labels_uni_line[lab] = 'Pit'
+
 
         fig = go.Figure(data=[go.Sankey(
         node = dict(
@@ -579,8 +602,8 @@ def display_sankey(year,drivName):
 
         fig.update_layout(title_text="Starting positions and placings of "\
         + drivName + " in "+str(year), title={'y':1},
-        title_font=dict(size=18, color='white', family="Lato, sans-serif"),
-        font=dict(size = 18, color = 'white', family="Lato, sans-serif"),
+        title_font=dict(size=22, color='white', family="Lato, sans-serif"),
+        font=dict(size = 22, color = 'white', family="Lato, sans-serif"),
         plot_bgcolor='#2d3035', paper_bgcolor='#2d3035')
     
         return fig
@@ -650,8 +673,8 @@ def display_sankey_2(year_sankey,pstn):
         pstn_print='position '+str(pstn)
     
     fig.update_layout(title_text = f'Placings in {str(year_sankey)} starting at {str(pstn_print)}',
-    title_font=dict(size=18, color='white', family="Lato, sans-serif"),
-    font=dict(size = 18, color = 'white', family="Lato, sans-serif"), title={'y':1},
+    title_font=dict(size=22, color='white', family="Lato, sans-serif"),
+    font=dict(size = 22, color = 'white', family="Lato, sans-serif"), title={'y':1},
         plot_bgcolor='#2d3035', paper_bgcolor='#2d3035')
 
 
