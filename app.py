@@ -343,9 +343,9 @@ app.layout = html.Div([
     html.Br(),
     html.Div([
         html.P(
-            'Authors: Inês Ribeiro, m20210595; J. Daniel Conde, José Dias, m20211009; m20210656; Matias Neves, m20211000',
+            'Authors: Inês Ribeiro, m20210595; J. Daniel Conde, m20210656; José Dias, m20211009; Matias Neves, m20211000',
             style = {'color': 'white'}),
-        html.P('Dataset source:', style = {'color': 'white'}),
+        html.P('Dataset sources:', style = {'color': 'white'}),
         html.A('Kaggle', href='https://www.kaggle.com/rohanrao/formula-1-world-championship-1950-2020?select=results.csv'),
         html.Br(),
         html.A('GitHub Countries Dataset', href='https://gist.github.com/zspine/2365808'),
@@ -421,7 +421,7 @@ def line_chart(scatter_years, scatter_circuits):
 
 
     layout_ppl = dict(
-                    title={'text':'Position of the drivers in each lap of this race','y':1},
+                    title={'text':'Position of the drivers in each lap of this race','y':0.98},
                     xaxis=dict(title='Lap'),
                     yaxis=dict(title='Position'),
                     plot_bgcolor='#2d3035', paper_bgcolor='#2d3035',
@@ -439,7 +439,7 @@ def line_chart(scatter_years, scatter_circuits):
     return fig_ppl
 
 
-###############################################################################################################
+###### Sankey Driver ################################################################################################
 @app.callback(
     Output('drivName', 'options'),
     Input('year', 'value'))
@@ -538,15 +538,15 @@ def display_sankey(year,drivName):
         ))])
 
         fig.update_layout(title_text="Starting positions and placings of "\
-        + drivName + " in "+str(year), title={'y':1},
+        + drivName + " in "+str(year), title={'y':0.98},
         title_font=dict(size=22, color='white', family="Lato, sans-serif"),
-        font=dict(size = 22, color = 'white', family="Lato, sans-serif"),
+        font=dict(size = 11, color = 'white', family="Lato, sans-serif"),
         plot_bgcolor='#2d3035', paper_bgcolor='#2d3035')
     
         return fig
 
 
-###############################################################################################################
+####### Sankey Position ###########################################################################################
 @app.callback(
     Output("graph2", "figure"), 
     [Input("year_sankey", "value")],
@@ -563,11 +563,8 @@ def display_sankey_2(year_sankey,pstn):
     results_yp = results_year_pstn[['driverId',\
         'driverName','raceId','grid','position','code','dob','nationality']]
     results_yp_abr = results_yp[['position','driverName']].sort_values(['position','driverName'])
-    
-
 
     driver_list = []
-
     curr_driver = list(results_yp_abr.iloc[0,:]) + [1]
 
     for i in range(1,len(results_yp_abr['position'])):
@@ -612,10 +609,8 @@ def display_sankey_2(year_sankey,pstn):
     
     fig.update_layout(title_text = f'Placings in {str(year_sankey)} starting at {str(pstn_print)}',
     title_font=dict(size=22, color='white', family="Lato, sans-serif"),
-    font=dict(size = 22, color = 'white', family="Lato, sans-serif"), title={'y':1},
+    font=dict(size = 11, color = 'white', family="Lato, sans-serif"), title={'y':0.98},
         plot_bgcolor='#2d3035', paper_bgcolor='#2d3035')
-
-
 
     return fig
 
