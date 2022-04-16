@@ -592,7 +592,8 @@ def display_sankey(year,drivName):
         pad = 15,
         thickness = 20,
         line = dict(color = "black", width = 0.5),
-        label = labels_uni_line
+        label = labels_uni_line,
+        color = 'LightCoral'
         ),
         link = dict(
         source = labels_final[:len(labels_final)//2], # indices correspond to labels, eg A1, A2, A1, B1, ...
@@ -660,7 +661,8 @@ def display_sankey_2(year_sankey,pstn):
         pad = 15,
         thickness = 20,
         line = dict(color = "black", width = 0.5),
-        label = labels_driver_uni_line
+        label = labels_driver_uni_line,
+        color = 'LightCoral'
         ),
         link = dict(
         source = labels_driver_final[:len(labels_driver_final)//2], # indices correspond to labels, eg A1, A2, A1, B1, ...
