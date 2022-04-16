@@ -1,18 +1,18 @@
 
 
 body {
-  background-color: #bec9d6;
+  background-color: #2d3035;
   margin: 5%;
 }
 
 
 .create_container {
-  border-radius: 5px;
-  background-color: #010915;
+  border: 3px solid #ffffff;
   margin: 18px;
   padding: 15px;
   position: relative;
   box-shadow: 2px 2px 2px #010915;
+  background-color: #2d3035;
 }
 
 .dcc_compon {
@@ -53,16 +53,16 @@ body {
 }
 
 .Select-control, .Select-menu-outer, .Select-multi-value-wrapper, .select-up, .is-open .Select-control {
-  background-color: #010915;
+  background-color: #8e8e8f;
   color: white;
 }
 
 .Select-control{
-  border: 0.5px solid rgb(255, 0, 0);
+  border: 0.5px solid rgb(255, 255, 255);
 }
 
 .has-value.Select--single>.Select-control .Select-value .Select-value-label, .has-value.is-pseudo-focused.Select--single>.Select-control .Select-value .Select-value-label {
-  color: white;
+  color: rgb(255, 255, 255);
 }
 
 /* width */
@@ -85,7 +85,7 @@ body {
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: white !important;
+  background: rgb(255, 255, 255) !important;
 }
 
 .rc-slider-track {
@@ -108,5 +108,39 @@ body {
 
 .rc.slider-handle-active:active {
   border-color: red;
+}
+
+
+
+
+.custom-tabs-container {
+  width: 85%;
+}
+.custom-tabs {
+  border-top-left-radius: 200px !important;
+  background-color: #2d3035;
+  padding: 0px 24px;
+  border-bottom: 1px solid #2d3035;
+}
+
+.custom-tab {
+  color:#8e8e8f;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  border-top: 3px solid transparent !important;
+  border-left: 200px !important;
+  border-right: 0px !important;
+  border-bottom: 0px !important;
+  background-color: rgb(194, 194, 194) !important;
+  padding: 12px !important;
+  font-family: "system-ui";
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+.custom-tab--selected {
+  color: #ffffff !important;
+  background-color: #8e8e8f !important;
+  border-top: 3px solid #ffffff !important;
 }
 
