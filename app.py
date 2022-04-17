@@ -331,8 +331,11 @@ app.layout = html.Div([
         ]),
         html.Br(),
 
-        html.P('This diagram shows driver position at the start and end of the race.\
-             It can be used to display race consistency.\
+        html.P('The "Per driver" diagram shows the driver\'s position at the \
+            start and end of the race. The "Per position" diagram shows the \
+                every driver\'s position at the end of the race for every \
+                    driver that started in the selected position. \
+             Both diagrams can be used to display race consistency. \
                  *Starting from Pit: Pit Lane Start\
                      **DNF: Did Not Finish', style = {'color':'white'})
                 ], className = "create_container six columns", style={'width':'100%'}),
