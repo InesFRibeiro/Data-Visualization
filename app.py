@@ -331,7 +331,7 @@ app.layout = html.Div([
         ]),
         html.Br(),
 
-        html.P('This graph shows driver position at the start and end of the race.\
+        html.P('This diagram shows driver position at the start and end of the race.\
              It can be used to display race consistency.\
                  *Starting from Pit: Pit Lane Start\
                      **DNF: Did Not Finish', style = {'color':'white'})
@@ -342,7 +342,7 @@ app.layout = html.Div([
     html.Br(),
     html.Div([
         html.P(
-            'Authors: Inês Ribeiro, m20210595; J. Daniel Conde, José Dias, m20211009; m20210656; Matias Neves, m20211000',
+            'Authors: Inês Ribeiro, m20210595; J. Daniel Conde, m20210656; José Dias, m20211009; Matias Neves, m20211000',
             style = {'color': 'white'}),
         html.P('Dataset source:', style = {'color': 'white'}),
         html.A('Kaggle', href='https://www.kaggle.com/rohanrao/formula-1-world-championship-1950-2020?select=results.csv'),
@@ -539,7 +539,7 @@ def display_sankey(year,drivName):
         fig.update_layout(title_text="Starting positions and placings of "\
         + drivName + " in "+str(year), title={'y':1},
         title_font=dict(size=22, color='white', family="Lato, sans-serif"),
-        font=dict(size = 22, color = 'white', family="Lato, sans-serif"),
+        font=dict(size = 11, color = 'white', family="Lato, sans-serif"),
         plot_bgcolor='#2d3035', paper_bgcolor='#2d3035')
     
         return fig
@@ -611,7 +611,7 @@ def display_sankey_2(year_sankey,pstn):
     
     fig.update_layout(title_text = f'Placings in {str(year_sankey)} starting at {str(pstn_print)}',
     title_font=dict(size=22, color='white', family="Lato, sans-serif"),
-    font=dict(size = 22, color = 'white', family="Lato, sans-serif"), title={'y':1},
+    font=dict(size = 11, color = 'white', family="Lato, sans-serif"), title={'y':1},
         plot_bgcolor='#2d3035', paper_bgcolor='#2d3035')
 
 
