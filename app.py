@@ -130,7 +130,7 @@ def bar_chart():
                             'y':1},
                             xaxis_title='Constructor ', yaxis_title="Number of Wins",
                             plot_bgcolor='#2d3035', paper_bgcolor='#2d3035',
-                            title_font=dict(size=22, color='white', family="Lato, sans-serif"),
+                            title_font=dict(size=20, color='white', family="Lato, sans-serif"),
                             font=dict(color='white'), 
                             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
                             )
@@ -158,7 +158,7 @@ def map():
     fig.update_layout(
         title={'text': "Number of Races per Country",'y':1},
         plot_bgcolor='#2d3035', paper_bgcolor='#2d3035',
-        title_font=dict(size=22, color='white', family="Lato, sans-serif"),
+        title_font=dict(size=20, color='white', family="Lato, sans-serif"),
         font=dict(color='white'), 
         margin=dict(l=0, r=0, t=35, b=15),
         )
@@ -185,7 +185,7 @@ def globe():
     fig.update_layout(
         title={'text': "Number of Drivers per Country",'y':1},
         plot_bgcolor='#2d3035', paper_bgcolor='#2d3035',
-        title_font=dict(size=22, color='white', family="Lato, sans-serif"),
+        title_font=dict(size=20, color='white', family="Lato, sans-serif"),
         font=dict(color='white'), 
         margin=dict(l=0, r=0, t=30, b=10),
         geo=dict(bgcolor= 'rgba(0,0,0,0)')
@@ -427,7 +427,7 @@ def line_chart(scatter_years, scatter_circuits):
                     xaxis=dict(title='Lap'),
                     yaxis=dict(title='Position'),
                     plot_bgcolor='#2d3035', paper_bgcolor='#2d3035',
-                    title_font=dict(size=22, color='white', family="Lato, sans-serif"),
+                    title_font=dict(size=20, color='white', family="Lato, sans-serif"),
                     font=dict(color='white'))
 
     fig_ppl = go.Figure(data=data_ppl, layout=layout_ppl)
@@ -541,7 +541,7 @@ def display_sankey(year,drivName):
 
         fig.update_layout(title_text="Starting positions and placings of "\
         + drivName + " in "+str(year), title={'y':1},
-        title_font=dict(size=22, color='white', family="Lato, sans-serif"),
+        title_font=dict(size=20, color='white', family="Lato, sans-serif"),
         font=dict(size = 11, color = 'white', family="Lato, sans-serif"),
         plot_bgcolor='#2d3035', paper_bgcolor='#2d3035')
     
@@ -613,7 +613,7 @@ def display_sankey_2(year_sankey,pstn):
         pstn_print='position '+str(pstn)
     
     fig.update_layout(title_text = f'Placings in {str(year_sankey)} starting at {str(pstn_print)}',
-    title_font=dict(size=22, color='white', family="Lato, sans-serif"),
+    title_font=dict(size=20, color='white', family="Lato, sans-serif"),
     font=dict(size = 11, color = 'white', family="Lato, sans-serif"), title={'y':1},
         plot_bgcolor='#2d3035', paper_bgcolor='#2d3035')
 
