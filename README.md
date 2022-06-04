@@ -10,7 +10,6 @@ The objective is to show how we managed to use visualization concepts and techni
 Using a Formula1 dataset, we created a dashboard to provide some informations through visualizations, which can be much more intuitive and easy to interpret than looking at the data itself.
 
 <br>
-<br>   
    
 **Group Members:**   
 \- Inês Ribeiro (https://github.com/InesFRibeiro)   
