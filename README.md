@@ -1,5 +1,5 @@
-# Data Visualization
-## Data Visualization Project 2021-2022   
+# Data Visualization Project 2021-2022
+## Formula 1 - Trends and Performance   
    
 **MSc:** Data Science and Advanced Analytics, NOVA IMS   
 **Grade:** 17.03 out of 20  
