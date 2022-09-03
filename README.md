@@ -10,7 +10,7 @@ The objective is to show how we managed to use visualization concepts and techni
 Using a Formula1 dataset, we created a dashboard to provide some informations through visualizations, which can be much more intuitive and easy to interpret than looking at the data itself.   
     
        
-*To see the dashboard, run the file app.py
+*To see the dashboard run the file app.py
 
 <br>
    
